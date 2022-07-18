@@ -1,0 +1,34 @@
+{
+    "items": 
+        [
+            {
+                "name": "DE05email_9",
+                "wrapperwidth": 1024,
+                "wrapperheight": 768,                
+                "tasks": [
+                    {
+                        "name" : "Task",
+                        "width" : 1024,
+                        "height" : 768
+                    }
+                ]
+            },
+            {
+                "name": "DE04chain_9",
+                "wrapperwidth": 1024,
+                "wrapperheight": 768,                
+                "tasks": [
+                    {
+                        "name" : "Task",
+                        "width" : 1024,
+                        "height" : 768
+                    }
+                ]
+            }
+        ]
+    ,
+    "default": {
+        "item" : "DE05email_9",
+        "task" : "Task"
+    }
+}

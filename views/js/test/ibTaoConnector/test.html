@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Likert Interaction Test</title>
+    <base href="../../../../../tao/views/"/>
+
+    <!-- <link rel="stylesheet" type="text/css" href="js/lib/qunit/qunit.css"> -->
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.10.1.css">
+    
+    <link rel="stylesheet" type="text/css" href="css/tao-main-style.css">
+    
+    <!-- <script type="text/javascript" src="js/lib/qunit/qunit.js"></script> -->
+    <script src="https://code.jquery.com/qunit/qunit-2.10.1.js"></script>
+
+    <script type="text/javascript" src="js/lib/require.js"></script>
+    <script type="text/javascript" src="js/lib/blanket/blanket.min.js" data-cover-only="/cbaIbPci/views/js/pciCreator/pciCbaIb/"></script>
+
+    <script type="text/javascript">
+
+        //don't start the test now
+        QUnit.config.autostart = false;
+
+        //load the config
+        require(['/tao/ClientConfig/config'], function () {
+
+            require.config({
+                paths: {
+                    'IMSGlobal/jquery_2_1_1': '../../../taoQtiItem/views/js/portableLib/jquery_2_1_1',
+                    'OAT/lodash': '../../../taoQtiItem/views/js/portableLib/OAT/lodash',
+                    'OAT/util/html': '../../../taoQtiItem/views/js/portableLib/OAT/util/html',
+                    'OAT/util/xml': '../../../taoQtiItem/views/js/portableLib/OAT/util/xml',
+                    'OAT/util/math': '../../../taoQtiItem/views/js/portableLib/OAT/util/math',
+                    'OAT/util/EventMgr': '../../../taoQtiItem/views/js/portableLib/OAT/util/EventMgr',
+                    'OAT/util/event': '../../../taoQtiItem/views/js/portableLib/OAT/util/event',
+                    'qtiCustomInteractionContext': '../../../taoQtiItem/views/js/runtime/qtiCustomInteractionContext'
+                }
+            });
+
+            //load the test
+            require(['cbaIbPci/test/pciCbaIb/test'], function () {
+
+                //Tests loaded, run tests
+                QUnit.config.reorder = false;
+                QUnit.start();
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture">
+    <div id="inner-container"></div>
+</div>
+
+<div id="outer-container"></div>
+<div id="response-display"></div>
+<div id="error-display"></div>
+</body>
+</html>

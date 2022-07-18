@@ -1,0 +1,52 @@
+
+Button[PUSH].backACTIVATED {
+	background-image: url( backward_activated.gif );
+}
+
+Button[PUSH].backDEACTIVATED {
+	background-image: url( backward_deactivated.gif );
+}
+
+Button[PUSH]:hover.backACTIVATED {
+	background-image: url( backward_mouseover.gif );
+}
+
+Button[PUSH].backPRESSED {
+	background-image: url( backward_pressed.gif );
+}
+
+Button[PUSH].forwardACTIVATED {
+	background-image: url( forward_activated.gif );
+}
+
+Button[PUSH].forwardDEACTIVATED {
+	background-image: url( forward_deactivated.gif );
+}
+
+Button[PUSH]:hover.forwardACTIVATED {
+	background-image: url( forward_mouseover.gif );
+}
+
+Button[PUSH].forwardPRESSED {
+	background-image: url( forward_pressed.gif );
+}
+Button[PUSH].bookmarkACTIVATED {
+	background-image: url( forward_pressed.gif );
+}
+Button[PUSH]:HOVER.bookmarkACTIVATED {
+	background-image: url( forward_pressed.gif );
+}
+Button[PUSH].bookmarkPRESSED {
+	background-image: url( forward_pressed.gif );
+}
+Button[PUSH].homeACTIVATED {
+	background-image: url( forward_pressed.gif );
+}
+Button[PUSH]:HOVER.homeACTIVATED {
+	background-image: url( forward_pressed.gif );
+}
+Button[PUSH].homePRESSED {
+	background-image: url( forward_pressed.gif );
+}
+
+ 

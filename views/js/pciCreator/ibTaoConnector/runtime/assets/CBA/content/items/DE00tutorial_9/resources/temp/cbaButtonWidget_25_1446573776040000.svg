@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+     
+     onload="loaded_cbaButtonWidget_25_1446573776040000();showContextMenu(false);"
+     
+	 viewBox="0 0 50 50" xml:space="preserve">
+
+
+
+    <cbaImageButton id="cbaButtonWidget_25_1446573776040000" />     
+     
+
+
+    <!-- javascript functions  -->
+    
+    <script>
+      <![CDATA[
+
+		
+
+
+    
+        var activatedImage = "ExitButton4_normal2.png";
+        var deactivatedImage = "ExitButton4_deactivated2.png";
+        var pressedImage = "ExitButton4_pressed2.png";
+        var mouseOverImage = "ExitButton4_mouseover2.png";    
+        var xlinkNs = "http://www.w3.org/1999/xlink";
+        var svgNs = "http://www.w3.org/2000/svg";
+        var xlink = "xlink:href";
+        var svgweb = getSVGObject();
+        var textAlignment = "center";
+            
+        
+        function loaded_cbaButtonWidget_25_1446573776040000() 
+        { 
+          var onloadFunc = doload_cbaButtonWidget_25_1446573776040000;
+          if (svgweb) 
+          {
+            svgweb.addOnLoad(onloadFunc, true, window);
+          }          
+        }
+        
+        
+        function getSVGObject()
+		{
+  			try
+  			{
+    			if (top.svgweb) return top.svgweb;
+    			//return getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().document.getElementById('cbaframe').contentWindow.svgweb;
+    			
+    			var cbaframe =  getRuntimeFrameReference();
+    			if (cbaframe != null)  return cbaframe.contentWindow.svgweb;
+    			
+    			return null;
+  			}
+  			catch(e)
+  			{
+    			return null;
+  			}    
+		}  
+		
+		function getRuntimeFrameReference()
+        {
+          	var cbaframe =  parent.parent.document.getElementById('cbaframe') ;
+          	if (cbaframe != null && cbaframe != undefined)  return cbaframe;
+    		
+    		//simple preview in EE
+    		var iframes = parent.parent.document.getElementsByTagName('iframe');
+    		for (var i = 0; i < iframes.length; i++) 
+          	{
+             	try
+             	{  
+             		var frameRef = iframes[i];
+                	var svgRef = frameRef.contentWindow.svgweb; 
+                	if (svgRef != null && svgRef != undefined) return frameRef;
+             	}
+             	catch(e) {}
+          	}
+    			
+          	return null;
+        }   
+              
+        function doload_cbaButtonWidget_25_1446573776040000() 
+        {
+          
+           
+          initialize_cbaButtonWidget_25_1446573776040000();
+          onImageLoad_cbaButtonWidget_25_1446573776040000();
+          handleTextAlignment();
+          document.onkeydown = customSearchWorkaround;
+          
+          var g = document.getElementById('cbaButtonWidget_25_1446573776040000_area');
+          g.addEventListener("click", function(evt) { 
+            doClick_cbaButtonWidget_25_1446573776040000(evt)
+          },  false);
+          
+          g.addEventListener("mousedown", function(evt) { 
+            changeImageMouseDown_cbaButtonWidget_25_1446573776040000(evt)
+          },  false);
+          
+          g.addEventListener("mouseup", function(evt) { 
+            changeImageMouseUp_cbaButtonWidget_25_1446573776040000(evt)
+          },  false);
+          
+          g.addEventListener("mouseover", function(evt) { 
+            changeImageMouseOver_cbaButtonWidget_25_1446573776040000(evt);
+          },  false);
+          
+          g.addEventListener("mouseout", function(evt) { 
+            changeImageMouseOut_cbaButtonWidget_25_1446573776040000(evt);
+          },  false); 
+          
+        }
+        
+        function handleTextAlignment()
+        {
+          var text = document.getElementById('cbaButtonWidget_25_1446573776040000_text');
+          if (text != null)
+          {
+                var width = text.getBBox().width;
+                var xPos = 0;
+                var buttonWidth = 50;
+                if (textAlignment === "center")
+                {
+                   xPos = (buttonWidth-width)/2;
+                }
+                if (textAlignment === "right")
+                {
+                   xPos = buttonWidth-width;
+                }
+                text.setAttribute("x", xPos);
+          }
+        }
+        
+        function customSearchWorkaround(ev)
+        {
+        	if (ev.ctrlKey) 
+			{
+				getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getElement().focus();
+			}  	
+        }
+        
+        
+        function createTooltip()
+        {
+          if (svgweb)
+          {
+            if (isFlash())
+            {
+              svgweb.createCBATooltip(document);
+            }
+          }   
+        }
+        
+        function isFlash()
+        {
+          return (svgweb.getHandlerType() == "flash");
+        }
+    
+        function showContextMenu( showContextMenu )
+        {
+            if (! showContextMenu) document.oncontextmenu = new Function( 'return false' );
+        }
+            
+        function getRealParentForImageButtonString_cbaButtonWidget_25_1446573776040000()
+        {
+            //if (parent.name == "cbaframe")
+            if (getRuntimeFrameReference() != null)
+            {
+                return "parent.parent";
+            }
+            else 
+            {
+                return "parent";
+            }
+        }
+
+        function getRealParentForImageButton_cbaButtonWidget_25_1446573776040000()
+        {
+            //if (parent.name == "cbaframe")
+            if (getRuntimeFrameReference() != null)
+            {
+                return parent.parent;
+            }
+            else 
+            {
+                return parent;
+            }
+        }
+
+        function getToggle()
+        {
+            var toggle = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getToggle();
+            return toggle;
+        }
+        
+        function getSelected()
+        {
+            var selected = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getSelected();
+            return selected;
+        }
+        
+        function getPressed()
+        {
+            if (getToggle() == "true")
+            {
+                if (getSelected() == "true")
+                {
+                    return true;
+                }
+                else 
+                    return false;
+            }
+            return false;
+        }
+        
+        
+                
+                               
+         
+        
+        function initialize_cbaButtonWidget_25_1446573776040000(evt)
+        {
+            getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().changeActiveImage_cbaButtonWidget_25_1446573776040000 = function changeActive(string) { doChange_cbaButtonWidget_25_1446573776040000(string); };
+            getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.setInitialized("true");
+     	    if (isFlash())
+			{
+               var resourcesFolder = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getResourceFolder();
+			   var contextPath = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getContextPath();
+			   resourcesFolder = contextPath + resourcesFolder;
+			   applyImages(resourcesFolder);   
+			}
+			else
+			{
+				applyImagesNamespace();
+			}
+        }    
+        
+        function applyImagesNamespace()
+		{
+		  applyImageNamespace("cbaButtonWidget_25_1446573776040000_image_activated", activatedImage);
+		  applyImageNamespace("cbaButtonWidget_25_1446573776040000_image_deactivated", deactivatedImage);
+		  applyImageNamespace("cbaButtonWidget_25_1446573776040000_image_pressed", pressedImage);
+		  applyImageNamespace("cbaButtonWidget_25_1446573776040000_image_mouseOver", mouseOverImage);
+		}
+               
+        function applyImageNamespace(imageId, imageName)
+		{
+		  if (imageName != "")
+		  {
+		    var image = document.getElementById(imageId);
+		    image.removeAttribute('href');
+		    image.setAttributeNS(xlinkNs, xlink, imageName);
+		  }
+		}        
+                 
+        function applyImages(resourcesFolder)
+		{
+		  applyImage("cbaButtonWidget_25_1446573776040000_image_activated", resourcesFolder, activatedImage);
+		  applyImage("cbaButtonWidget_25_1446573776040000_image_deactivated", resourcesFolder, deactivatedImage);
+		  applyImage("cbaButtonWidget_25_1446573776040000_image_pressed", resourcesFolder, pressedImage);
+		  applyImage("cbaButtonWidget_25_1446573776040000_image_mouseOver", resourcesFolder, mouseOverImage);
+		}
+               
+        function applyImage(imageId, resourcesFolder, imageName)
+		{
+		  if (imageName != "")
+		  {
+		    var image = document.getElementById(imageId);
+		    var imagePath = ".." + resourcesFolder + imageName;
+		    image.setAttributeNS(xlinkNs, xlink, imagePath);
+		  }
+		}                
+                                
+        function doChange_cbaButtonWidget_25_1446573776040000(active)
+        {       
+           if (active=="true")
+		   {
+		     if (getPressed())
+		     { 
+		       pressed();
+		     }
+		     else
+		     {  
+		       activate();
+		     }
+		   }
+		   else
+		   {  
+		     deactivate();
+		   }
+        }
+                    
+        function onImageLoad_cbaButtonWidget_25_1446573776040000(evt)
+        {       
+           var active = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getActivate();
+           doChange_cbaButtonWidget_25_1446573776040000(active);
+        }       
+        
+        function hideAllImages()
+		{
+		  var im1 = document.getElementById('cbaButtonWidget_25_1446573776040000_image_activated'); 
+		  var im2 = document.getElementById('cbaButtonWidget_25_1446573776040000_image_deactivated'); 
+		  var im3 = document.getElementById('cbaButtonWidget_25_1446573776040000_image_pressed'); 
+		  var im4 = document.getElementById('cbaButtonWidget_25_1446573776040000_image_mouseOver'); 
+		  im1.setAttribute("style","opacity:0");
+		  im2.setAttribute("style","opacity:0");
+		  im3.setAttribute("style","opacity:0");
+		  im4.setAttribute("style","opacity:0");
+		} 
+		
+		
+		function activate()
+		{
+		  hideAllImages();
+		  var im = document.getElementById('cbaButtonWidget_25_1446573776040000_image_activated');
+		  im.setAttribute("style","opacity:1");
+		}
+		
+		function deactivate()
+		{
+		  hideAllImages();
+		  var im = document.getElementById('cbaButtonWidget_25_1446573776040000_image_deactivated');
+		  im.setAttribute("style","opacity:1");
+		}		
+        
+		function applyMouseOver()
+		{
+		  hideAllImages();
+		  var im = document.getElementById('cbaButtonWidget_25_1446573776040000_image_mouseOver');
+		  im.setAttribute("style","opacity:1");
+		}
+		
+		
+		function pressed()
+		{
+		  hideAllImages();
+		  var im = document.getElementById('cbaButtonWidget_25_1446573776040000_image_pressed');
+		  im.setAttribute("style","opacity:1"); 
+		}   
+        
+        function doClick_cbaButtonWidget_25_1446573776040000(evt)
+        {
+            var active = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getActivate();
+            var cbaImageButtonId = "cbaButtonWidget_25_1446573776040000";
+            if (active=="true")
+            {
+                if (getToggle() == "true" && getSelected() != "true" )
+                {
+                eval(getRealParentForImageButtonString_cbaButtonWidget_25_1446573776040000() + "." + cbaImageButtonId +".doSelectionChange(\"true\");"); 
+                }else{
+                eval(getRealParentForImageButtonString_cbaButtonWidget_25_1446573776040000() + "." + cbaImageButtonId +".doSelectionChange(\"false\");"); 
+                }
+                eval(getRealParentForImageButtonString_cbaButtonWidget_25_1446573776040000() + "." + cbaImageButtonId + ".doClickEvent();"); 
+                //setTimeout('onImageLoad_cbaButtonWidget_25_1446573776040000()',500);
+            }                                       
+        }     
+        
+		function changeImageMouseDown_cbaButtonWidget_25_1446573776040000(evt)
+		{ 
+		  var active = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getActivate();
+		  if (active=="true")
+		  {
+		    pressed();
+		  }
+		  else
+		  {
+		    deactivate();
+		  }
+		}
+           
+		function changeImageMouseUp_cbaButtonWidget_25_1446573776040000(evt)
+		{
+		  var active = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getActivate();
+		  doChange_cbaButtonWidget_25_1446573776040000(active);
+		  eval(getRealParentForImageButtonString_cbaButtonWidget_25_1446573776040000()+".textSelectionModeProvider.disableSelectionMode();");                          
+		}
+           
+		function changeImageMouseOver_cbaButtonWidget_25_1446573776040000(evt)
+		{
+		  var active = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getActivate();
+		  
+		  if (active=="true")
+		  {
+		    if(mouseOverImage != "")
+		    {
+		      applyMouseOver();
+		    }
+		  }
+		  else
+		  {
+		    deactivate();
+		  }
+		} 
+           
+		function changeImageMouseOut_cbaButtonWidget_25_1446573776040000(evt)
+		{                  
+		  var active = getRealParentForImageButton_cbaButtonWidget_25_1446573776040000().cbaButtonWidget_25_1446573776040000.getActivate();
+		  doChange_cbaButtonWidget_25_1446573776040000(active);
+		}   
+    
+
+
+
+
+    ]]>
+    </script>   
+    
+
+	
+	
+
+
+    
+    <g id="cbaButtonWidget_25_1446573776040000_area" pointer-events="all" >
+    
+        
+         
+         <image id="cbaButtonWidget_25_1446573776040000_image_activated" x="0%" y="0%" width="100%" height="100%" href="ExitButton4_normal2.png" style="opacity:0" cursor="pointer"/>
+		 <image id="cbaButtonWidget_25_1446573776040000_image_deactivated" x="0%" y="0%" width="100%" height="100%" href="ExitButton4_deactivated2.png" style="opacity:0" cursor="pointer"/>
+		 <image id="cbaButtonWidget_25_1446573776040000_image_pressed" x="0%" y="0%" width="100%" height="100%" href="ExitButton4_pressed2.png" style="opacity:0" cursor="pointer"/>
+		 <image id="cbaButtonWidget_25_1446573776040000_image_mouseOver" x="0%" y="0%" width="100%" height="100%" href="ExitButton4_mouseover2.png" style="opacity:0" cursor="pointer"/>
+         
+         
+         
+         
+         
+        
+    </g> 
+
+     
+
+    
+</svg>
