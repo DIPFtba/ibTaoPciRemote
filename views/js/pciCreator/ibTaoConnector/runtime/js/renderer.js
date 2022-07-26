@@ -31,12 +31,8 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
         }
     }
     
-    function refreshSrc(id, $container, config, assetManager){
-        if(typeof config.item  == "string" && typeof config.task  == "string"){
-            // let _url = config.url+"/src/pages/emulatorPage.html?itemName="+config.item+"&taskName="+config.task;
-            let _url = assetManager.resolve('ibTaoConnector/runtime/assets/CBA/src/pages/emulatorPage.html')+"?itemName="+config.item+"&taskName="+config.task;
-            $container.find("#cbaframe").attr("src", _url);
-        }
+    function refreshSrc(id, $container, url){
+        $container.find("#cbaframe").attr("src", url);
     }
 
     return {
@@ -46,7 +42,8 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
 
             // renderChoices(id, $container, config);
             // renderLabels(id, $container, config, assetManager);
-            refreshSrc(id, $container, config, assetManager);
+            // refreshSrc(id, $container, config, assetManager);
+            refreshSrc(id, $container, config.url);
             updateIframe(id, $container, config);
             
             //render rich text content in prompt
@@ -56,8 +53,8 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
             //     html.render($container.find('.prompt'));
             // }
         },
-        refreshSrc : function(id, container, config, assetManager){
-            refreshSrc(id, $(container), config, assetManager);
+        refreshSrc : function(id, container, url){
+            refreshSrc(id, $(container), url);
         },
         updateIframe : function(id, container, config){
             updateIframe(id, $(container), config);

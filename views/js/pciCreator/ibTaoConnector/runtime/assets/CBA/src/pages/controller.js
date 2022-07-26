@@ -135,7 +135,7 @@ const Controller = {
       },
 
       transmitTraceLogData: function (traceData) {
-        console.log(parent);
+        // console.log(parent);
         // parent.controller.getItem().extCBAEvent(traceData);
         window.parent.postMessage({
           type: "vo.ToPlayer.CBAEvent",

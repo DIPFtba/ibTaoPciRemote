@@ -1,4 +1,4 @@
-<div class="pciCbaIb">
+<div class="ibTaoConnector">
     <!-- 
     <div class="prompt">{{{prompt}}}</div>
     <ul class="likert"></ul> 

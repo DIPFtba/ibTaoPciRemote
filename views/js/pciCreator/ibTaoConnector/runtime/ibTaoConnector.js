@@ -19,11 +19,10 @@
 define(['qtiCustomInteractionContext',
         'ibTaoConnector/runtime/js/jquery_2_1_1_amd',
         'ibTaoConnector/runtime/js/renderer',
-        'ibTaoConnector/runtime/js/itemManager',
-        'ibTaoConnector/runtime/js/zipson.min',
-        'OAT/util/event',
+        'ibTaoConnector/runtime/js/lzstring',
+        'OAT/util/event'
     ],
-    function(qtiCustomInteractionContext, $, renderer, itemMgr, zipson, event){
+    function(qtiCustomInteractionContext, $, renderer, LZString, event){
     'use strict';
 
     var ibTaoConnector = {
@@ -49,7 +48,6 @@ define(['qtiCustomInteractionContext',
             this.dom = dom;
             this.config = config || {};
             this.startTime = Date.now();
-            this.itemData = _.clone(config) || null;
             this.assetManager = assetManager;
 
             this.response = new Map();
@@ -61,36 +59,9 @@ define(['qtiCustomInteractionContext',
             //tell the rendering engine that I am ready
             qtiCustomInteractionContext.notifyReady(this);
 
-            //listening to dynamic configuration change
-            // this.on('levelchange', function(level){
-            //     self.config.level = level;
-            //     renderer.renderChoices(self.id, self.dom, self.config);
-            // });
-
-
-            const setItemData = function(targetItem){
-                
-                if(self.itemData.item == targetItem.item && self.itemData.task == targetItem.task)
-                    return;
-
-                self.itemData = targetItem;                
-                _.assign(self.config, {
-                        item: targetItem.item,
-                        task: targetItem.task,
-                        itemIdx: targetItem.itemIdx,
-                        taskIdx: targetItem.taskIdx
-                    }
-                );                
-            }
-
-            this.on('urlchange', function(item, task){
-                let targetItem = itemMgr.getItemData(item, task);
-                if(!targetItem){
-                    return;
-                    // throw new Error("Item does not exist.")
-                }
-                setItemData(targetItem);
-                renderer.refreshSrc(self.id, self.dom, self.config, assetManager);
+            this.on('urlchange', function(url){
+                self.config.url = url || self.config.url;
+                renderer.refreshSrc(self.id, self.dom, url);
                 self.scaleContents();                    
             });
                         
@@ -127,98 +98,55 @@ define(['qtiCustomInteractionContext',
                 console.log("receive", type, data);
                 // console.log(1);
                 
+                const scoringResultReturn = (data) => {
+                    console.log("getScoringResultReturn", data);
+                    let results = data["result"];
+
+                    // let tmp = Object.keys(data["params"][1]["incidents"])[0];
+                    // let identifier = tmp.substring(tmp.indexOf("/item")+1).replace("/",".").replace("task=","").replace("item=","");
+
+                    
+                    /*  
+                    *   for valid indentifier characters, check:
+                    *   \vendor\qtism\qtism\qtism\common\utils\data\CharacterMap.php        
+                    *   \vendor\qtism\qtism\qtism\runtime\pci\json\Unmarshaller.php
+                    */
+
+                    let classes = [];
+                    let hits = [];
+                    
+                    for (let i of Object.keys(results)) {
+                        if (i.indexOf("hit.") >= 0 && results[i] == true)
+                            hits.push(i.split(".")[1]);
+                    }
+
+                    for (let i of Object.keys(results)) {
+                        if (i.indexOf("hitClass.") >= 0) {
+                            let hit = hits.indexOf(i.split(".")[1]);
+                            if (hit >= 0){
+                                let text = "";
+                                if(typeof results["hitText."+hits[hit]] == "string")
+                                    text = results["hitText."+hits[hit]];
+                                classes.push({ "class": results[i], "hit": hits[hit], "text": text });
+                                this.response.set(results[i] + ".hit", hits[hit]);
+                                if(text.length>0)
+                                    // this.response.set(identifier + "." + results[i] + ".hitText", text);
+                                    this.response.set(results[i] + ".hitText", text);
+                            }
+                        }
+                    }
+                }
+
                 const callbacks = {
                     
-                    "vo.ToPlayer.CBAEndTaskResponse": (data) => {
-                        console.log("vo.ToPlayer.CBAEndTaskResponse", data);
-                        let results = data["params"][0];
-
-                        let tmp = Object.keys(data["params"][1]["incidents"])[0];
-                        let identifier = tmp.substring(tmp.indexOf("/item")+1).replace("/",".").replace("task=","").replace("item=","");
-
-                        
-                        /*  
-                        *   for valid indentifier characters, check:
-                        *   \vendor\qtism\qtism\qtism\common\utils\data\CharacterMap.php        
-                        *   \vendor\qtism\qtism\qtism\runtime\pci\json\Unmarshaller.php
-                        */
-
-                        let classes = [];
-                        let hits = [];
-                        
-                        for (let i of Object.keys(results)) {
-                            if (i.indexOf("hit.") >= 0 && results[i] == true)
-                                hits.push(i.split(".")[1]);
-                        }
-
-                        for (let i of Object.keys(results)) {
-                            if (i.indexOf("hitClass.") >= 0) {
-                                let hit = hits.indexOf(i.split(".")[1]);
-                                if (hit >= 0){
-                                    let text = "";
-                                    if(typeof results["hitText."+hits[hit]] == "string")
-                                        text = results["hitText."+hits[hit]];
-                                    classes.push({ "class": results[i], "hit": hits[hit], "text": text });
-                                    // this.response.set(this.itemData.item + "." + this.itemData.task + "." + results[i], hits[hit]);
-                                    this.response.set(identifier + "." + results[i] + ".hit", hits[hit]);
-                                    if(text.length>0)
-                                        this.response.set(identifier + "." + results[i] + ".hitText", text);
-                                }
-                            }
-                        }
-                    },
-
-                    "vo.ToPlayer.EE4CBACommand": (data) => {
-                        console.log("vo.ToPlayer.EE4CBACommand", data);
-                        if(!data.params)
-                            return;
-    
-                        let targetMap = {
-                            "back": "#previous"
-                        };
-                        let target = "#next";
-                        
-                        stopTask();
-
-                        if(data.params.length > 0){
-                            if(targetMap[data.params[0]])
-                                target = targetMap[data.params[0]];
-                            
-                            let targetItem = null;
-
-                            if(target == "#next"){
-                                targetItem = itemMgr.getNext(self.config.item, self.config.task);
-                            }
-
-                            else if(target == "#previous"){
-                                targetItem = itemMgr.getPrevious(self.config.item, self.config.task);
-                            }
-
-                            if(_.isObject(targetItem)){
-                                    setItemData(targetItem);
-                                    renderer.refreshSrc(self.id, self.dom, self.config, self.assetManager);
-                                    self.scaleContents();                
-                            }
-                            //trigger next tao section
-                            else
-                            {
-                                if($("[data-control='move-forward'").length)
-                                    $("[data-control='move-forward'").trigger("click");
-                                else if($("[data-control='next-section'").length)
-                                    $("[data-control='next-section'").trigger("click");
-                            }
-                        }
-                    },
+                    "getScoringResultReturn": scoringResultReturn,
+                    "getTasksStateReturn": scoringResultReturn,
                     
-                    "vo.ToPlayer.CBAEvent": (data) => {
-                        if(!!data["params"] && !!data["params"][0]){
-                            this.traceLogs.push(data["params"][0]);
+                    "traceLogTransmission": (data) => {
+                        if(!!data["traceLogData"]){
+                            this.traceLogs.push(data["traceLogData"]);
                         }
-                    },
-
-                    "vo.ToPlayer.DataTransfer": (data) => {
-                        console.log(data);
-                    }                
+                    }              
                 };
     
                 if (typeof callbacks[type] !== 'undefined') {
@@ -228,34 +156,19 @@ define(['qtiCustomInteractionContext',
     
             // listen to messages from parent frame
             window.addEventListener('message', event => {
-                receive(event.data.type, event.data);
+                let data = JSON.parse(event.data);
+                receive(data.eventType, data);
             }, false);
 
         },
 
-/*
-        getItemData: function(callback, assetManager){
-            // let _url = this.config.url + "content/items/" + this.config.item + "/"  + this.config.item + ".json";
-            let _url = assetManager.resolve('ibTaoConnector/runtime/assets/CBA/content/items/')+this.config.item+"/"+this.config.item+".json";
-            $.getJSON(_url, function(data) {
-                if(typeof callback == "function")
-                    callback(data);
-            });
-        },
-*/
-
         scaleContents: function(){
 
-            if(this.itemData == null)
-                return;
-
-            let width = this.itemData.width;
-            let height = this.itemData.height;
+            let width = this.config.iwidth;
+            let height = this.config.iheight;
 
             let scale =  (this.config.width / width).toFixed(2);
-            // let content = $("#cbaframe").contents();
             let content = $("#cbaframe");
-            // $(content).find("body>iframe")
             $(content)
             .css("width", "" + width)
             .css("height", "" + height)
@@ -263,8 +176,8 @@ define(['qtiCustomInteractionContext',
             .css("transform-origin", "top left");
             
             let scroll = "hidden";
-            if(this.config.height<(scale*height))
-                scroll = "scroll";
+            // if(this.config.height<(scale*height))
+            //     scroll = "scroll";
 
             $("#itemwrapper")
             .css("width", "" + this.config.width)
@@ -284,10 +197,6 @@ define(['qtiCustomInteractionContext',
          */
         setResponse : function(response){
 
-            // var $container = $(this.dom),
-            //     value = response && response.base ? parseInt(response.base.integer) : -1;
-
-            // $container.find('input[value="' + value + '"]').prop('checked', true);
         },
         /**
          * Get the response in the json format described in
@@ -297,21 +206,6 @@ define(['qtiCustomInteractionContext',
          * @returns {Object}
          */
         getResponse : function(interaction){
-
-            //*******  pciCreator.json *******/
-            // "response": {
-            //     "cardinality": "record",
-            //     "identifier": "RESPONSE"
-            // },
-            // "response": {
-            //     "baseType": "string",
-            //     "cardinality": "single"
-            // },            
-
-            // var $container = $(this.dom),
-            //     value = parseInt($container.find('input:checked').val()) || 0;
-            
-            // console.log(this);
 
             let _response = {};
 
@@ -334,76 +228,12 @@ define(['qtiCustomInteractionContext',
             return  {
                 base : {
                     // string : JSON.stringify(['test', '123']).replace(/"/g,"'")
-                    string : JSON.stringify(_response).replace(/"/g,"'")
+                    // string : JSON.stringify(_response).replace(/"/g,"'")
+                    string : LZString.compressToBase64(JSON.stringify(_response))
                 }
             }
-
-
-
-        /********* type: record  ***********
-
-            let response =  {
-                record : [
-                    // {
-                    //     name : 'response',
-                    //     base : {string : "no data"}
-                    // }                    
-                ]
-            };
-
-            if(this.response.size>0){
-                this.response.forEach((_hit, _class) => {
-                    let tmp = {};
-                    tmp[_class] = _hit;
-                    response.record.push({
-                        name : _class,
-                        base : {string : JSON.stringify(tmp)}
-                    });
-                })
-            }
-
-            if(this.traceLogs.length>0){
-                response.record.push({type: "tracelogs", zipson: zipson.stringify(this.traceLogs, true)});
-            }
-
-            */
-
-        /* 
-            pair / multiple
-
-            let response = {
-                list: {
-                    pair: [
-                    ]
-                }
-            }
-
-            if(this.response.size>0){
-                this.response.forEach((_hit, _class) => {
-                    let tmp = [];
-                    tmp.push(_class);
-                    tmp.push(_hit);
-                    response.list.pair.push(tmp);
-                })
-            }
-
-        */
-
-            // console.log(response);
-            return response;
         },
-        /**
-         * Remove the current response set in the interaction
-         * The state may not be restored at this point.
-         * 
-         * @param {Object} interaction
-         */
-        resetResponse : function(){
 
-            var $container = $(this.dom);
-
-            $container.find('input').prop('checked', false);
-        },
         /**
          * Reverse operation performed by render()
          * After this function is executed, only the inital naked markup remains 

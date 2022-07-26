@@ -23,10 +23,9 @@ define([
     'taoQtiItem/qtiCreator/editor/simpleContentEditableElement',
     'taoQtiItem/qtiCreator/editor/containerEditor',
     'tpl!ibTaoConnector/creator/tpl/propertiesForm',
-    'ibTaoConnector/runtime/js/itemManager',
     'lodash',
     'jquery'
-], function(stateFactory, Question, formElement, simpleEditor, containerEditor, formTpl, itemMgr, _, $){
+], function(stateFactory, Question, formElement, simpleEditor, containerEditor, formTpl, _, $){
     'use strict';
 
     
@@ -47,37 +46,16 @@ define([
             $form = _widget.$form,
             interaction = _widget.element,
             response = interaction.getResponseDeclaration(),
-            itemName = interaction.prop('item'),
-            entryTask = interaction.prop('task'),
-            wrapperwidth = interaction.prop('wrapperwidth'),
-            wrapperheight = interaction.prop('wrapperheight');
-
-        let itemData = itemMgr.getConf();
-        let items = itemData.items;
-        
-        let _getTasks = function(itm){
-            let _tmp = [];
-            for(let i in items){
-                if(items[i].name == itm){
-                    for(let j in items[i].tasks){
-                        _tmp.push(items[i].tasks[j].name);
-                    }   
-                }
-            }
-            return _tmp;
-        }
-        let tasks = _getTasks(itemName);
+            url = interaction.prop('url'),
+            width = interaction.prop('width'),
+            height = interaction.prop('height');
 
         //render the form using the form template
         $form.html(formTpl({
             serial : response.serial,
-            // levels : levelData,
-            item: itemName,
-            task: entryTask,
-            items: items,
-            tasks: tasks,
-            wrapperwidth: wrapperwidth,
-            wrapperheight: wrapperheight
+            url: url,
+            width: width,
+            height: height
         }));
 
         //init form javascript
@@ -85,37 +63,20 @@ define([
 
         //init data change callbacks
         formElement.setChangeCallbacks($form, interaction, {
-            // url: function(interaction, value){
-            //     // console.log(interaction, value);
-            //     interaction.prop('url', value);
-            //     interaction.triggerPci('urlchange', [value, null, null]);
-            // },
-            item: function(interaction, value){
-                let tasks = _getTasks(value);
-                // console.log(tasks, value, $form);
-                let _select = $($form).find("#task");
-                if(_select.length>0 && tasks.length>0){
-                    _select.empty();
-                    for(let task of tasks){
-                        _select.append('<option value="'+task+'">'+task+'</option>');
-                    }
-                }
-                interaction.prop('item', value);
-                interaction.triggerPci('urlchange', [value, null]);
-            },
-            task: function(interaction, value){
-                console.log(interaction, value);
-                interaction.prop('task', value);
-                interaction.triggerPci('urlchange', [interaction.prop('item'), value]);
-            },
-            wrapperwidth: function(interaction, value){
+            url: function(interaction, value){
                 // console.log(interaction, value);
-                interaction.prop('wrapperwidth', value);
+                interaction.prop('url', value);
+                interaction.triggerPci('urlchange', [value]);
+            },
+
+            width: function(interaction, value){
+                // console.log(interaction, value);
+                interaction.prop('width', value);
                 interaction.triggerPci('itempropchange', [value, null]);
             },
-            wrapperheight: function(interaction, value){
+            height: function(interaction, value){
                 // console.log(interaction, value);
-                interaction.prop('wrapperheight', value);
+                interaction.prop('height', value);
                 interaction.triggerPci('itempropchange', [null, value]);
             },
         });

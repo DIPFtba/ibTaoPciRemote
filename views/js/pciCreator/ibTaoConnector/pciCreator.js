@@ -51,7 +51,7 @@ define([
          * @returns {Object}
          */
         getDefaultProperties : function(pci){
-            return itmMgr.getDefaultEntrypoint();
+            return itmMgr.getConf();
         },
         /**
          * (optional) Callback to execute on the 
@@ -79,8 +79,6 @@ define([
         getMarkupData : function(pci, defaultData){
             defaultData.prompt = pci.data('prompt');
             defaultData.url = this.getDefaultProperties().url;
-            defaultData.item = this.getDefaultProperties().item;
-            defaultData.task = this.getDefaultProperties().task;
             return defaultData;
         }
     };
