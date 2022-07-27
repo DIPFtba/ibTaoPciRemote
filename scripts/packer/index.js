@@ -15,7 +15,7 @@ const argv = yargs(hideBin(process.argv))
   .describe("u", "Remote player URL for the PCI to connect")
   .alias("i", "item")
   .nargs("i", 1)
-  .describe("i", "Item ZIP to read scaling information from (optional)")
+  .describe("i", "folder containering at least one item to read information from (optional)")
   .alias("o", "output")
   .nargs("o", 1)
   .describe("o", "Output directory (default: current directory)").argv;
@@ -27,17 +27,22 @@ let confFile = "../../views/js/pciCreator/ibTaoConnector/confDefault.json";
 let conf = JSON.parse(fs.readFileSync(confFile));
 
 
-if (!fs.existsSync(argv.i) || path.extname(argv.i) != ".zip") {
-  console.error("Not a valid zip file: " + argv.i);
-  // process.exit(1);
-} else {
-  try {
-    item = new Item(new AdmZip(argv.i));
-  } catch (e) {
-    console.error(e.message);
-  }
+if (!fs.existsSync(argv.i)) {
+    console.error("Folder not readable: " + argv.i);
 }
-
+else{
+    let items = fs.readdirSync(argv.i).filter(i => i.indexOf(".zip")>=0);
+    if(items.length==0){
+        console.error("Folder does not contain a valid zip file: " + argv.i);
+    }
+    else {
+        try {
+            item = new Item(new AdmZip(path.join(argv.i, items[0])));
+        } catch (e) {
+            console.error(e.message);
+        }
+    }
+}
 
 
 const stringIsAValidUrl = (s) => {
@@ -100,6 +105,8 @@ let pciZip = new AdmZip();
 pciZip.addLocalFolder(path.join(__dirname, "../../views/js/pciCreator/ibTaoConnector"));
 
 let outpath = fs.existsSync(argv.o) ? path.basename(argv.o) : "./";
-pciZip.writeZip(path.join(outpath, "ibTaoConnector.zip"));
+let zipfile = path.join(outpath, "ibTaoConnector.zip");
+console.log("creating "+zipfile)
+pciZip.writeZip(zipfile);
 
 process.exit();
