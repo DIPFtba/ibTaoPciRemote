@@ -45,6 +45,7 @@ const stringIsAValidUrl = (s) => {
     new URL(s);
     return true;
   } catch (err) {
+    console.error(err.message);
     return false;
   }
 };
