@@ -22,12 +22,56 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
     function updateIframe(id, $container, config){
         // console.log(config);
         if(config.width > 0 && config.height > 0){
+
+            let itemWidth = config.iwidth;
+            let itemHeight = config.iheight;
+
+            let scalingFactor = 1;
+
+            //unscaled, up, down, updown
+            let scaling = "down";
+
+            let availHeight =  (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+            let availWidth =  (window.visualViewport && window.visualViewport.width) ? window.visualViewport.width : window.innerWidth;
+            availHeight = availHeight<config.height ? availHeight : config.height;
+            availWidth = availWidth<config.width ? availWidth : config.width;
+            
+            if (
+              scaling == "unscaled" ||
+              ((availHeight < itemHeight || availWidth < itemWidth) &&
+                scaling == "up") ||
+              (availHeight > itemHeight &&
+                availWidth > itemWidth &&
+                scaling == "down")
+            ) {
+              scalingFactor = 1;
+            } else {
+              let sfh = 1;
+              let sfw = 1;
+              if (availHeight < itemHeight)
+                sfh = Math.ceil((availHeight * 1000) / itemHeight) / 1000;
+              if (availWidth < itemWidth)
+                sfw = Math.ceil((availWidth * 1000) / itemWidth) / 1000;
+              scalingFactor = sfh;
+              if (
+                (scaling == "down" || scaling == "updown") &&
+                (sfh < 1 || sfw < 1)
+              )
+                scalingFactor = Math.min(sfh, sfw);
+            }
+
             $container.find("#cbaframe")
-            // .attr("width", config.width)
-            // .attr("height", config.height)
-            // .css("width", "100%")
-            .css("width", config.width)
-            .css("height", config.height);
+            .css("width",  itemWidth+"px")
+            .css("height", itemHeight+"px")
+            .css("transform", "scale("+scalingFactor+")")
+            .css("transform-origin", "top left");
+
+            // $container.find("#cbaframe")
+            // // .attr("width", config.width)
+            // // .attr("height", config.height)
+            // // .css("width", "100%")
+            // .css("width", config.width)
+            // .css("height", config.height);
         }
     }
     

@@ -54,7 +54,6 @@ define(['qtiCustomInteractionContext',
             this.traceLogs = [];
 
             renderer.render(this.id, this.dom, this.config, assetManager);
-            self.scaleContents();
 
             //tell the rendering engine that I am ready
             qtiCustomInteractionContext.notifyReady(this);
@@ -62,7 +61,7 @@ define(['qtiCustomInteractionContext',
             this.on('urlchange', function(url){
                 self.config.url = url || self.config.url;
                 renderer.refreshSrc(self.id, self.dom, url);
-                self.scaleContents();                    
+                // self.scaleContents();
             });
                         
             this.on('itempropchange', function(width, height){
@@ -82,16 +81,7 @@ define(['qtiCustomInteractionContext',
                 self.config.width = width || self.config.width;
                 self.config.height = height || self.config.height;
                 renderer.updateIframe(self.id, self.dom, self.config);
-                self.scaleContents();
             });
-
-
-            const stopTask = () => {
-                if ((document.getElementById("cbaframe") != null) &&
-                    (document.getElementById("cbaframe").contentWindow.flash_communicator != null)) {
-                    document.getElementById("cbaframe").contentWindow.flash_communicator.stopTask();
-                }
-            };
 
             const receive = (type, data) => {
 
@@ -161,31 +151,6 @@ define(['qtiCustomInteractionContext',
             }, false);
 
         },
-
-        scaleContents: function(){
-
-            let width = this.config.iwidth;
-            let height = this.config.iheight;
-
-            let scale =  (this.config.width / width).toFixed(2);
-            let content = $("#cbaframe");
-            $(content)
-            .css("width", "" + width)
-            .css("height", "" + height)
-            .css("transform", "scale("+scale+")")
-            .css("transform-origin", "top left");
-            
-            let scroll = "hidden";
-            // if(this.config.height<(scale*height))
-            //     scroll = "scroll";
-
-            $("#itemwrapper")
-            .css("width", "" + this.config.width)
-            .css("height", "" + this.config.height)
-            .css("overflow-x", "hidden")
-            .css("overflow-y", scroll);
-        },
-
 
 
         /**
