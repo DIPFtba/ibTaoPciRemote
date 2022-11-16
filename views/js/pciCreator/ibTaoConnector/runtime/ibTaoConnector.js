@@ -36,7 +36,7 @@ define(['qtiCustomInteractionContext',
          * @param {Node} dom
          * @param {Object} config - json
          */
-        initialize : function(id, dom, config, assetManager){
+        initialize : function(dom, config){
 
             console.log("-init-");
             var self = this;
@@ -44,45 +44,81 @@ define(['qtiCustomInteractionContext',
             //add method on(), off() and trigger() to the current object
             event.addEventMgr(this);
 
-            this.id = id;
             this.dom = dom;
             this.config = config || {};
             this.startTime = Date.now();
-            this.assetManager = assetManager;
 
             this.response = new Map();
+            this.responseRaw = [];
             this.traceLogs = [];
 
-            renderer.render(this.id, this.dom, this.config, assetManager);
+            /********** get assessment configuration to determine end of sequence (now solved via postMessage) ***********/
+            // fetch(config.url + "assessments/config.json", {
+            //     method: "GET",
+            //     cache: "no-cache",
+            //     headers: {
+            //         'Accept': 'application/json'
+            //     }                    
+            // })
+            // .then(r => r.ok ? Promise.resolve(r) : Promise.reject(new Error(r.statusText)))            
+            // .then(r => r.json())            
+            // .then(r => {
+            //     if(!!r)
+            //         this.config = Object.assign(this.config, {assessments: r});
+            // });            
+
+            /****** hide next / skip buttons (workaround for navigationLock) ******/
+            document.querySelectorAll("[data-control='next-section'], [data-control='move-end'], [data-control='move-forward'], [data-control='skip-end']")
+            .forEach(e => e.classList.add("hidden"));            
+
+            renderer.render(this.id, this.dom, this.config);
 
             //tell the rendering engine that I am ready
             qtiCustomInteractionContext.notifyReady(this);
+
+            window.onresize = (e) => {
+                renderer.updateIframe(self.id, self.dom, self.config);
+            };
 
             this.on('urlchange', function(url){
                 self.config.url = url || self.config.url;
                 renderer.refreshSrc(self.id, self.dom, url);
                 // self.scaleContents();
             });
-                        
-            this.on('itempropchange', function(width, height){
+            
+            this.on('itempropchange', function(width, height, iwidth, iheight){
                 width = parseInt(width);
                 height = parseInt(height);
+                iwidth = parseInt(iwidth);
+                iheight = parseInt(iheight);
                 if(
-                    (self.config.width == width && self.config.height == height) || 
+                    (self.config.width == width && self.config.height == height && self.config.iwidth == iwidth && self.config.iheight == iheight) || 
                     width < 100 ||
                     height < 100 ||
+                    iwidth < 100 ||
+                    iheight < 100 ||
                     width > 2560 ||
-                    height > 1600
-                ){
+                    height > 1600 ||
+                    iwidth > 2560 ||
+                    iheight > 1600
+                    ){
                         return;
-                    // throw new Error("Dimensions out of range.")
-                }
-
+                        // throw new Error("Dimensions out of range.")
+                    }
+                    
                 self.config.width = width || self.config.width;
                 self.config.height = height || self.config.height;
+                self.config.iwidth = iwidth || self.config.iwidth;
+                self.config.iheight = iheight || self.config.iheight;
                 renderer.updateIframe(self.id, self.dom, self.config);
             });
 
+            this.on('h_alignchange', function(alignh){
+                self.config.alignh = alignh || self.config.alignh;
+                renderer.updateIframe(self.id, self.dom, self.config);
+                // self.scaleContents();
+            });
+            
             const receive = (type, data) => {
 
                 console.log("receive", type, data);
@@ -125,10 +161,26 @@ define(['qtiCustomInteractionContext',
                             }
                         }
                     }
+
+                    this.responseRaw.push(results);
+                }
+
+                const endOfSequence = () => {
+
+                    if($("[data-control='submit']").length)
+                        $("[data-control='submit']").trigger("click");
+
+                    if($("[data-control='move-end']").length)
+                        $("[data-control='move-end']").trigger("click");
+                    else if($("[data-control='move-forward']").length)
+                        $("[data-control='move-forward']").trigger("click");
+                    else if($("[data-control='next-section']").length)
+                        $("[data-control='next-section']").trigger("click");
                 }
 
                 const callbacks = {
                     
+                    "endOfSequence": endOfSequence,
                     "getScoringResultReturn": scoringResultReturn,
                     "getTasksStateReturn": scoringResultReturn,
                     
@@ -153,6 +205,23 @@ define(['qtiCustomInteractionContext',
         },
 
 
+        getInstance :  function(dom, config, state){
+            // (t.properties = Object.assign(Object.assign({}, r), t.properties)),
+            // (this.config = t),
+            // (this.shadowdom = e.attachShadow({ mode: "closed" })),
+            // renderer.render(),
+            // t.onready(this),
+            // window.addEventListener(
+            //     "message",
+            //     (e) => {
+            //     let t = JSON.parse(e.data);
+            //     this.receive(t.eventType, t);
+            //     },
+            //     !1
+            // ),
+            this.initialize(dom, config.properties);
+        },
+
         /**
          * Programmatically set the response following the json schema described in
          * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
@@ -174,6 +243,8 @@ define(['qtiCustomInteractionContext',
 
             let _response = {};
 
+            _response['scoreRaw'] = this.responseRaw;
+
             if(this.response.size>0){
                 let score = {
                     hits: {}
@@ -183,7 +254,7 @@ define(['qtiCustomInteractionContext',
                 });
                 _response['score'] = score;
             }
-            
+
             if(this.traceLogs.length>0){
                 // _response['logs'] = zipson.stringify(this.traceLogs);
                 _response['logs'] = this.traceLogs;
@@ -232,8 +303,19 @@ define(['qtiCustomInteractionContext',
          */
         getSerializedState : function(){
             return {response : this.getResponse()};
+        },
+
+        getState : function(){
+            return {response : this.getResponse()};
+        },
+
+        /**
+         * Called by delivery engine when PCI is fully completed
+         */
+        oncompleted : function oncompleted(){
+            this.destroy();
         }
-    };
+};
 
     qtiCustomInteractionContext.register(ibTaoConnector);
 });

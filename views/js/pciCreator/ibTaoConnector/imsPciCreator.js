@@ -51,7 +51,9 @@ define([
          * @returns {Object}
          */
         getDefaultProperties : function(pci){
-            return itmMgr.getConf();
+            let _default = {alignh: "left", navigationLock: true};
+            let _conf = Object.assign(itmMgr.getConf(), _default);
+            return _conf;
         },
         /**
          * (optional) Callback to execute on the 

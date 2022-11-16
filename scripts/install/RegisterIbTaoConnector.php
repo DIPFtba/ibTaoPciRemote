@@ -23,12 +23,12 @@ namespace oat\ibTaoConnector\scripts\install;
 use oat\taoQtiItem\model\portableElement\action\RegisterPortableElement;
 
 /**
- * Script to register the PCI "pciCbaIb"
+ * Script to register the PCI "ibTaoConnector"
  *
  * Usage:
- * sudo -u www-data php index.php '\oat\cbaIbPci\scripts\install\RegisterCbaIbPci'
+ * sudo -u www-data php index.php '\oat\cbaIbPci\scripts\install\RegisterIbTaoConnector'
  *
- * @package oat\cbaIbPci\scripts\install
+ * @package oat\ibTaoConnector\scripts\install
  */
 class RegisterIbTaoConnector extends RegisterPortableElement
 {

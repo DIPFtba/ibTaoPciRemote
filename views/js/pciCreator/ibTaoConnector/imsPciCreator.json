@@ -1,4 +1,5 @@
 {
+    "model": "IMSPCI",
     "typeIdentifier": "ibTaoConnector",
     "label": "Itembuilder integration",
     "short": "Itembuilder integration",
@@ -14,31 +15,23 @@
     },    
     "runtime" : {
         "hook" : "./runtime/ibTaoConnector.js",
-        "libraries" : [
-            "./runtime/js/jquery_2_1_1_amd.js",
-            "./runtime/js/renderer.js",
+        "modules" : {
+            "ibTaoConnector/runtime/ibTaoConnector" : [
+            "runtime/ibTaoConnector.js"
+            ]
+        },
+        "src" : [
+            "./runtime/ibTaoConnector.js",
             "./runtime/js/ajv.min.js",
             "./runtime/js/itemManager.js",
-            "./runtime/js/lzstring.js"
-        ],
-        "stylesheets" : [
-            "./runtime/css/base.css",
-            "./runtime/css/ibTaoConnector.css"
-        ],
-        "mediaFiles" : [
-            "./runtime/css/img/bg.png",
-            "./runtime/assets/CBA/src/pages/configurationRetriever.js",
-            "./runtime/assets/CBA/src/pages/controller.js",
-            "./runtime/assets/CBA/src/pages/emulatorPage.js",
-            "./runtime/assets/CBA/src/pages/taskPlayerReceiver.js",
-            "./runtime/assets/CBA/src/pages/taskPlayerSender.js",
-            "./runtime/assets/CBA/src/pages/emulatorPage.html",
-            "./runtime/assets/CBA/src/pages/reactRuntime.html"
-        ]
+            "./runtime/js/jquery_2_1_1_amd.js",
+            "./runtime/js/lzstring.js",
+            "./runtime/js/renderer.js"
+        ]        
     },
     "creator" : {
         "icon": "./creator/img/icon.svg",
-        "hook": "./pciCreator.js",
+        "hook": "./imsPciCreator.js",
         "libraries" : [
             "./creator/tpl/markup.tpl",
             "./creator/tpl/propertiesForm.tpl",

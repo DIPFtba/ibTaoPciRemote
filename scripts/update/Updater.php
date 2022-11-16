@@ -19,7 +19,7 @@
  *
  */
 
-namespace oat\cbaIbPci\scripts\update;
+namespace oat\ibTaoConnector\scripts\update;
 
 use oat\cbaIbPci\scripts\install\RegisterCbaIbPci;
 
