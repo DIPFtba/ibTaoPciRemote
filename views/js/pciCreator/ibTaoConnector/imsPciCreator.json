@@ -4,7 +4,7 @@
     "label": "Itembuilder integration",
     "short": "Itembuilder integration",
     "description": "Itembuilder integration for remotely hosted items",
-    "version": "1.5.0",
+    "version": "2.0.0",
     "author": "Felix Wagner",
     "email": "wagnerf@dipf.de",
     "tags": [],
