@@ -260,6 +260,8 @@ define(['qtiCustomInteractionContext',
                 _response['logs'] = this.traceLogs;
             }
 
+            if(!_response['score'] && !_response['logs'])
+                return { base: null };
 
             return  {
                 base : {
