@@ -198,6 +198,8 @@ define(['qtiCustomInteractionContext',
     
             // listen to messages from parent frame
             window.addEventListener('message', event => {
+				if(typeof event?.data != "string")
+					return;
                 let data = JSON.parse(event.data);
                 receive(data.eventType, data);
             }, false);
@@ -206,20 +208,8 @@ define(['qtiCustomInteractionContext',
 
 
         getInstance :  function(dom, config, state){
-            // (t.properties = Object.assign(Object.assign({}, r), t.properties)),
-            // (this.config = t),
-            // (this.shadowdom = e.attachShadow({ mode: "closed" })),
-            // renderer.render(),
-            // t.onready(this),
-            // window.addEventListener(
-            //     "message",
-            //     (e) => {
-            //     let t = JSON.parse(e.data);
-            //     this.receive(t.eventType, t);
-            //     },
-            //     !1
-            // ),
             this.initialize(dom, config.properties);
+            config.onready(this);
         },
 
         /**
