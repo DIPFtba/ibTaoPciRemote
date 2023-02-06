@@ -20,59 +20,65 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
     'use strict';
 
     function updateIframe(id, $container, config){
-        // console.log(config);
-        if(config.width > 0 && config.height > 0){
 
-            let itemWidth = config.iwidth;
-            let itemHeight = config.iheight;
+      let wrapper = $container.find("#cbaframe")[0];
+      let scalingFactor = 1;          
 
-            let scalingFactor = 1;
+      if(config.width > 0 && config.height > 0){
 
-            //unscaled, up, down, updown
-            let scaling = "down";
+          let itemWidth = config.iwidth;
+          let itemHeight = config.iheight;
 
-            let availHeight =  (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
-            let availWidth =  (window.visualViewport && window.visualViewport.width) ? window.visualViewport.width : window.innerWidth;
-            availHeight = availHeight<config.height ? availHeight : config.height;
-            availWidth = availWidth<config.width ? availWidth : config.width;
-            
+          //unscaled, up, down, updown
+          let scaling = "down";
+
+          let availHeight =  (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+          let availWidth =  (window.visualViewport && window.visualViewport.width) ? window.visualViewport.width : window.innerWidth;
+
+          if(!!document.querySelector("section.content-wrapper")){
+            availHeight = document.querySelector("section.content-wrapper").clientHeight-20;
+            availWidth = document.querySelector("section.content-wrapper").clientWidth;
+            if(!!document.querySelector("section.content-wrapper").style)
+                document.querySelector("section.content-wrapper").style.overflow = "hidden";
+          }
+
+          if(!!document.querySelector("div.tao-scope.runtime")){
+            document.querySelector("div.tao-scope.runtime").style.padding = "0px";
+          }
+
+          availHeight = availHeight<config.height ? availHeight : config.height;
+          availWidth = availWidth<config.width ? availWidth : config.width;
+          
+          if (
+            scaling == "unscaled" ||
+            ((availHeight < itemHeight || availWidth < itemWidth) &&
+              scaling == "up") ||
+            (availHeight > itemHeight &&
+              availWidth > itemWidth &&
+              scaling == "down")
+          ) {
+            scalingFactor = 1;
+          } else {
+            let sfh = 1;
+            let sfw = 1;
+            if (availHeight < itemHeight)
+              sfh = Math.ceil((availHeight * 1000) / itemHeight) / 1000;
+            if (availWidth < itemWidth)
+              sfw = Math.ceil((availWidth * 1000) / itemWidth) / 1000;
+            scalingFactor = sfh;
             if (
-              scaling == "unscaled" ||
-              ((availHeight < itemHeight || availWidth < itemWidth) &&
-                scaling == "up") ||
-              (availHeight > itemHeight &&
-                availWidth > itemWidth &&
-                scaling == "down")
-            ) {
-              scalingFactor = 1;
-            } else {
-              let sfh = 1;
-              let sfw = 1;
-              if (availHeight < itemHeight)
-                sfh = Math.ceil((availHeight * 1000) / itemHeight) / 1000;
-              if (availWidth < itemWidth)
-                sfw = Math.ceil((availWidth * 1000) / itemWidth) / 1000;
-              scalingFactor = sfh;
-              if (
-                (scaling == "down" || scaling == "updown") &&
-                (sfh < 1 || sfw < 1)
-              )
-                scalingFactor = Math.min(sfh, sfw);
-            }
+              (scaling == "down" || scaling == "updown") &&
+              (sfh < 1 || sfw < 1)
+            )
+              scalingFactor = Math.min(sfh, sfw);
+          }
 
-            $container.find("#cbaframe")
-            .css("width",  itemWidth+"px")
-            .css("height", itemHeight+"px")
-            .css("transform", "scale("+scalingFactor+")")
-            .css("transform-origin", "top left");
-
-            // $container.find("#cbaframe")
-            // // .attr("width", config.width)
-            // // .attr("height", config.height)
-            // // .css("width", "100%")
-            // .css("width", config.width)
-            // .css("height", config.height);
-        }
+          wrapper.style.width = itemWidth+"px";
+          wrapper.style.height = itemHeight+"px";
+          wrapper.style.transform = "scale("+scalingFactor+")";
+          if(!!config.alignh)
+            wrapper.style.transformOrigin = "top " + config.alignh;
+      }
     }
     
     function refreshSrc(id, $container, url){

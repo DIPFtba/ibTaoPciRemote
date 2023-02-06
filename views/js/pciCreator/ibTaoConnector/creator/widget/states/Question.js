@@ -42,20 +42,38 @@ define([
 
     CbaIbStateQuestion.prototype.initForm = function(){
 
-        var _widget = this.widget,
+            var _widget = this.widget,
             $form = _widget.$form,
             interaction = _widget.element,
             response = interaction.getResponseDeclaration(),
             url = interaction.prop('url'),
             width = interaction.prop('width'),
-            height = interaction.prop('height');
+            height = interaction.prop('height'),
+            iwidth = interaction.prop('iwidth'),
+            iheight = interaction.prop('iheight'),
+            alignh = interaction.prop('alignh'),
+            navigationLock = interaction.prop('navigationLock');
+
+            let options_alignh =
+            [
+                {label: "left", key: "left"},
+                {label: "right", key: "right"},
+                {label: "center", key: "center"}
+            ]
+            .map((e) => {
+                return e.key == alignh ? Object.assign(e, {selected: true}) : e;
+            })
 
         //render the form using the form template
         $form.html(formTpl({
             serial : response.serial,
             url: url,
             width: width,
-            height: height
+            height: height,
+            iwidth: iwidth,
+            iheight: iheight,
+            alignh: options_alignh,
+            navigationLock: navigationLock
         }));
 
         //init form javascript
@@ -72,13 +90,31 @@ define([
             width: function(interaction, value){
                 // console.log(interaction, value);
                 interaction.prop('width', value);
-                interaction.triggerPci('itempropchange', [value, null]);
+                interaction.triggerPci('itempropchange', [value, null, null, null]);
             },
             height: function(interaction, value){
                 // console.log(interaction, value);
                 interaction.prop('height', value);
-                interaction.triggerPci('itempropchange', [null, value]);
+                interaction.triggerPci('itempropchange', [null, value, null, null]);
             },
+            iwidth: function(interaction, value){
+                // console.log(interaction, value);
+                interaction.prop('iwidth', value);
+                interaction.triggerPci('itempropchange', [null, null, value, null]);
+            },
+            iheight: function(interaction, value){
+                // console.log(interaction, value);
+                interaction.prop('iheight', value);
+                interaction.triggerPci('itempropchange', [null, null, null, value]);
+            },
+            alignh: function(interaction, value){
+                // console.log(interaction, value);
+                interaction.prop('alignh', value);
+                interaction.triggerPci('h_alignchange', [value]);
+            },
+            navigationLock: function navigationLock(interaction, value) {
+                interaction.prop('navigationLock', value);
+            },                           
         });
 
     };

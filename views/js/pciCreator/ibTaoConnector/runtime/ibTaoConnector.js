@@ -64,23 +64,37 @@ define(['qtiCustomInteractionContext',
                 // self.scaleContents();
             });
                         
-            this.on('itempropchange', function(width, height){
+            this.on('itempropchange', function(width, height, iwidth, iheight){
                 width = parseInt(width);
                 height = parseInt(height);
+                iwidth = parseInt(iwidth);
+                iheight = parseInt(iheight);
                 if(
-                    (self.config.width == width && self.config.height == height) || 
+                    (self.config.width == width && self.config.height == height && self.config.iwidth == iwidth && self.config.iheight == iheight) || 
                     width < 100 ||
                     height < 100 ||
+                    iwidth < 100 ||
+                    iheight < 100 ||
                     width > 2560 ||
-                    height > 1600
-                ){
+                    height > 1600 ||
+                    iwidth > 2560 ||
+                    iheight > 1600
+                    ){
                         return;
-                    // throw new Error("Dimensions out of range.")
-                }
-
+                        // throw new Error("Dimensions out of range.")
+                    }
+                    
                 self.config.width = width || self.config.width;
                 self.config.height = height || self.config.height;
+                self.config.iwidth = iwidth || self.config.iwidth;
+                self.config.iheight = iheight || self.config.iheight;
                 renderer.updateIframe(self.id, self.dom, self.config);
+            });
+
+            this.on('h_alignchange', function(alignh){
+                self.config.alignh = alignh || self.config.alignh;
+                renderer.updateIframe(self.id, self.dom, self.config);
+                // self.scaleContents();
             });
 
             const receive = (type, data) => {
@@ -191,6 +205,8 @@ define(['qtiCustomInteractionContext',
                 _response['logs'] = this.traceLogs;
             }
 
+            if(!_response['score'] && !_response['logs'])
+                return { base: null };            
 
             return  {
                 base : {
