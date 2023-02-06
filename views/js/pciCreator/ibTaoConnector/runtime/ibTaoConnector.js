@@ -146,6 +146,8 @@ define(['qtiCustomInteractionContext',
     
             // listen to messages from parent frame
             window.addEventListener('message', event => {
+				if(typeof event?.data != "string")
+					return;
                 let data = JSON.parse(event.data);
                 receive(data.eventType, data);
             }, false);
