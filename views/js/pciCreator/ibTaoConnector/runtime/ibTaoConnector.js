@@ -188,11 +188,9 @@ define(['qtiCustomInteractionContext',
 						else if($("[data-control='next-section']").length)
 							$("[data-control='next-section']").trigger("click");
 					}                    
-					
                 }
 
                 const callbacks = {
-                    
                     "endOfSequence": endOfSequence,
                     "getScoringResultReturn": scoringResultReturn,
                     "getTasksStateReturn": scoringResultReturn,
@@ -246,7 +244,7 @@ define(['qtiCustomInteractionContext',
 
             let _response = {};
 
-            _response['scoreRaw'] = this.responseRaw;
+            // _response['scoreRaw'] = this.responseRaw;
 
             if(this.response.size>0){
                 let score = {
