@@ -127,6 +127,10 @@ define(['qtiCustomInteractionContext',
                 // console.log(1);
                 
                 const scoringResultReturn = (data) => {
+
+                    if(!data || !data["result"])
+                        return;
+
                     console.log("getScoringResultReturn", data);
                     let results = data["result"];
 
