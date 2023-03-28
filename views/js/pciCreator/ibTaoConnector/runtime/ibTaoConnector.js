@@ -120,6 +120,11 @@ define(['qtiCustomInteractionContext',
                 renderer.updateIframe(self.id, self.dom, self.config);
                 // self.scaleContents();
             });
+
+            this.on('fullscreenchange', function(value){
+                self.config.fullscreen = value ? true : false;
+                renderer.updateIframe(self.id, self.dom, self.config);
+            });            
             
             const receive = (type, data) => {
 
