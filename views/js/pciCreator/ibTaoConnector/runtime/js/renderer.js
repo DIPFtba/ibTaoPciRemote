@@ -21,64 +21,119 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
 
     function updateIframe(id, $container, config){
 
-      let wrapper = $container.find("#cbaframe")[0];
-      let scalingFactor = 1;          
+        let wrapper = $container.find("#cbaframe")[0];
+        let scalingFactor = 1;
+        
+        wrapper.style.width = "100%";
+        wrapper.style.height = "100%";
+        
+        if(config.fullscreen && config.width > 0 && config.height > 0){
 
-      if(config.width > 0 && config.height > 0){
+            let itemWidth = config.iwidth;
+            let itemHeight = config.iheight;
 
-          let itemWidth = config.iwidth;
-          let itemHeight = config.iheight;
+            //unscaled, up, down, updown
+            let scaling = "down";
 
-          //unscaled, up, down, updown
-          let scaling = "down";
+            let availHeight =  (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+            let availWidth =  (window.visualViewport && window.visualViewport.width) ? window.visualViewport.width : window.innerWidth;
 
-          let availHeight =  (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
-          let availWidth =  (window.visualViewport && window.visualViewport.width) ? window.visualViewport.width : window.innerWidth;
+            if(!!document.querySelector("section.content-wrapper")){
+              availHeight = document.querySelector("section.content-wrapper").clientHeight-20;
+              availWidth = document.querySelector("section.content-wrapper").clientWidth;
+              if(!!document.querySelector("section.content-wrapper").style)
+                  document.querySelector("section.content-wrapper").style.overflow = "hidden";
+            }
 
-          if(!!document.querySelector("section.content-wrapper")){
-            availHeight = document.querySelector("section.content-wrapper").clientHeight-20;
-            availWidth = document.querySelector("section.content-wrapper").clientWidth;
-            if(!!document.querySelector("section.content-wrapper").style)
-                document.querySelector("section.content-wrapper").style.overflow = "hidden";
-          }
+            if(!!document.querySelector("div.tao-scope.runtime")){
+              document.querySelector("div.tao-scope.runtime").style.padding = "0px";
+            }
 
-          if(!!document.querySelector("div.tao-scope.runtime")){
-            document.querySelector("div.tao-scope.runtime").style.padding = "0px";
-          }
-
-          availHeight = availHeight<config.height ? availHeight : config.height;
-          availWidth = availWidth<config.width ? availWidth : config.width;
-          
-          if (
-            scaling == "unscaled" ||
-            ((availHeight < itemHeight || availWidth < itemWidth) &&
-              scaling == "up") ||
-            (availHeight > itemHeight &&
-              availWidth > itemWidth &&
-              scaling == "down")
-          ) {
-            scalingFactor = 1;
-          } else {
-            let sfh = 1;
-            let sfw = 1;
-            if (availHeight < itemHeight)
-              sfh = Math.ceil((availHeight * 1000) / itemHeight) / 1000;
-            if (availWidth < itemWidth)
-              sfw = Math.ceil((availWidth * 1000) / itemWidth) / 1000;
-            scalingFactor = sfh;
+            availHeight = availHeight<config.height ? availHeight : config.height;
+            availWidth = availWidth<config.width ? availWidth : config.width;
+            
             if (
-              (scaling == "down" || scaling == "updown") &&
-              (sfh < 1 || sfw < 1)
-            )
-              scalingFactor = Math.min(sfh, sfw);
-          }
+              scaling == "unscaled" ||
+              ((availHeight < itemHeight || availWidth < itemWidth) &&
+                scaling == "up") ||
+              (availHeight > itemHeight &&
+                availWidth > itemWidth &&
+                scaling == "down")
+            ) {
+              scalingFactor = 1;
+            }
 
-          wrapper.style.width = itemWidth+"px";
-          wrapper.style.height = itemHeight+"px";
-          wrapper.style.transform = "scale("+scalingFactor+")";
-          if(!!config.alignh)
-            wrapper.style.transformOrigin = "top " + config.alignh;
-      }
+            else {
+              let sfh = 1;
+              let sfw = 1;
+              if (availHeight < itemHeight)
+                sfh = Math.ceil((availHeight * 1000) / itemHeight) / 1000;
+              if (availWidth < itemWidth)
+                sfw = Math.ceil((availWidth * 1000) / itemWidth) / 1000;
+              scalingFactor = sfh;
+              if (
+                (scaling == "down" || scaling == "updown") &&
+                (sfh < 1 || sfw < 1)
+              )
+                scalingFactor = Math.min(sfh, sfw);
+            }
+
+            wrapper.style.width = itemWidth+"px";
+            wrapper.style.height = itemHeight+"px";
+            wrapper.style.transform = "scale("+scalingFactor+")";
+            if(!!config.alignh)
+              wrapper.style.transformOrigin = "top " + config.alignh;
+        }
+
+        else{
+          
+            let wrapper_2 = $container.find("#itemwrapper")[0];
+            let wrapper_3 = $container.find(".ibTaoConnector")[0];
+            let itemWidth = config.iwidth;
+            let itemHeight = config.iheight;
+
+            //unscaled, up, down, updown
+            let scaling = "down";
+            let availWidth =  wrapper_3.clientWidth;
+            let availHeight =  (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+            
+            availHeight = availHeight<config.height ? availHeight : config.height;
+            availWidth = availWidth<config.width ? availWidth : config.width;
+            
+            if (
+                scaling == "unscaled" ||
+                ((availHeight < itemHeight || availWidth < itemWidth) &&
+                  scaling == "up") ||
+                (availHeight > itemHeight &&
+                  availWidth > itemWidth &&
+                  scaling == "down")
+            ) {
+                scalingFactor = 1;
+            }
+            
+            else {
+              let sfh = 1;
+              let sfw = 1;
+              if (availHeight < itemHeight)
+                sfh = Math.ceil((availHeight * 1000) / itemHeight) / 1000;
+              if (availWidth < itemWidth)
+                sfw = Math.ceil((availWidth * 1000) / itemWidth) / 1000;
+              scalingFactor = sfh;
+              if (
+                (scaling == "down" || scaling == "updown") &&
+                (sfh < 1 || sfw < 1)
+              )
+                scalingFactor = Math.min(sfh, sfw);
+            }
+
+            wrapper.style.width = itemWidth+"px";
+            wrapper.style.height = itemHeight+"px";
+            wrapper.style.transform = "scale("+scalingFactor+")";
+            wrapper.style.transformOrigin = "top left";
+            
+            wrapper_2.style.height = Math.round(scalingFactor*itemHeight)+"px";
+            wrapper_2.style.width = Math.round(scalingFactor*itemWidth)+"px";
+        }
     }
     
     function refreshSrc(id, $container, url){

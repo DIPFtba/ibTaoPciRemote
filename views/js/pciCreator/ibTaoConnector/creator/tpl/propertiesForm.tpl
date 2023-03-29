@@ -11,6 +11,18 @@
 </div>
 
 <div class="panel">
+ <label>
+    <input name="fullscreen" type="checkbox" {{#if fullscreen}}checked="checked"{{/if}}/>
+    <span class="icon-checkbox"></span>
+        {{__ "Fullscreen"}}
+    </label>
+    <span class="icon-help tooltipstered" data-tooltip="~ .tooltip-content:first" data-tooltip-theme="info"></span>
+    <span class="tooltip-content">
+        {{__ 'PCI is configured to occupy all the available space. Do not use, if this item should host other interactions.'}}
+    </span>
+</div>
+
+<div class="panel">
     <label for="width" class="has-icon">{{__ "Item wrapper width"}}</label>
     <input type="text"
            name="width"
