@@ -21,9 +21,12 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
 
         function updateIframe(id, $container, config){
 
-          let wrapper = $container.find("#cbaframe")[0];
+            let wrapper = $container.find("iframe")[0];
           let scalingFactor = 1;
           
+            if(!wrapper)
+              return;
+
           wrapper.style.width = "100%";
           wrapper.style.height = "100%";
           
@@ -87,7 +90,7 @@ define(['ibTaoConnector/runtime/js/jquery_2_1_1_amd', 'OAT/util/html'], function
 
         else{
           
-            let wrapper_2 = $container.find("#itemwrapper")[0];
+              let wrapper_2 = $container.find(".itemwrapper")[0];
             let wrapper_3 = $container.find(".ibTaoConnector")[0];
             let itemWidth = config.iwidth;
             let itemHeight = config.iheight;

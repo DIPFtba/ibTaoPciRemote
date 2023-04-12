@@ -25,18 +25,49 @@ define(['qtiCustomInteractionContext',
     function(qtiCustomInteractionContext, $, renderer, LZString, event){
     'use strict';
 
-    var ibTaoConnector = {
-        id : -1,
-        getTypeIdentifier : function(){
-            return 'ibTaoConnector';
-        },
-        /**
-         * Render the PCI : 
-         * @param {String} id
-         * @param {Node} dom
-         * @param {Object} config - json
-         */
-        initialize : function(dom, config){
+
+    function ibTaoConnector(dom, config) {
+
+            this.getResponse = function() {
+                let _response = {};
+
+                // _response['scoreRaw'] = this.responseRaw;
+    
+                if(this.response.size>0){
+                    let score = {
+                        hits: {}
+                    }
+                    this.response.forEach((_hit, _class) => {
+                        score.hits[_class] = _hit
+                    });
+                    _response['score'] = score;
+                }
+    
+                if(this.traceLogs.length>0){
+                    // _response['logs'] = zipson.stringify(this.traceLogs);
+                    _response['logs'] = this.traceLogs;
+                }
+    
+                if(!_response['score'] && !_response['logs'])
+                    return { base: null };
+    
+                return  {
+                    base : {
+                        // string : JSON.stringify(['test', '123']).replace(/"/g,"'")
+                        // string : JSON.stringify(_response).replace(/"/g,"'")
+                        string : LZString.compressToBase64(JSON.stringify(_response))
+                    }
+                }
+            }
+
+            this.oncompleted = function(){
+                if(!!document.querySelector("section.content-wrapper").style)
+                    document.querySelector("section.content-wrapper").style.overflow = "auto";            
+                var $container = $(this.dom);
+                $container.off().empty();                
+            }
+
+            this.off = this.oncompleted;
 
             console.log("-init-");
             var self = this;
@@ -51,6 +82,11 @@ define(['qtiCustomInteractionContext',
             this.response = new Map();
             this.responseRaw = [];
             this.traceLogs = [];
+            this.iframe = null;
+
+            let _iframe = this.dom.find("iframe");
+            if(_iframe.length>0)
+                this.iframe = _iframe[0];
 
             /********** get assessment configuration to determine end of sequence (now solved via postMessage) ***********/
             // fetch(config.url + "assessments/config.json", {
@@ -78,9 +114,30 @@ define(['qtiCustomInteractionContext',
             //tell the rendering engine that I am ready
             qtiCustomInteractionContext.notifyReady(this);
 
-            window.onresize = (e) => {
+            window.addEventListener('resize', e => {
+                if(e.target == window && !self.config.fullscreen)
+                    return;
                 renderer.updateIframe(self.id, self.dom, self.config);
-            };
+            });
+
+            if(typeof ResizeObserver == "function"){
+                const resizeObserver = new ResizeObserver((entries) => {
+                    // We wrap it in requestAnimationFrame to avoid this error - ResizeObserver loop limit exceeded
+                    window.requestAnimationFrame(() => {
+                        if (!Array.isArray(entries) || !entries.length) {
+                            return;
+                        }
+                        renderer.updateIframe(self.id, self.dom, self.config);
+                    });                    
+                    // renderer.updateIframe(self.id, self.dom, self.config);
+                });
+                resizeObserver.observe(this.dom[0]);
+            }
+
+            // window.onresize = e => {
+            //     renderer.updateIframe(self.id, self.dom, self.config);
+            // };
+
 
             this.on('urlchange', function(url){
                 self.config.url = url || self.config.url;
@@ -126,6 +183,7 @@ define(['qtiCustomInteractionContext',
                 renderer.updateIframe(self.id, self.dom, self.config);
             });            
             
+
             const receive = (type, data) => {
 
                 console.log("receive", type, data);
@@ -216,116 +274,21 @@ define(['qtiCustomInteractionContext',
             window.addEventListener('message', event => {
 				if(typeof event?.data != "string")
 					return;
+                if(event.source !== this.iframe.contentWindow)
+                    return;
                 let data = JSON.parse(event.data);
                 receive(data.eventType, data);
             }, false);
+    };
 
+
+    qtiCustomInteractionContext.register({
+        getTypeIdentifier : function(){
+            return 'heICnX';
         },
-
-
         getInstance :  function(dom, config, state){
-            this.initialize(dom, config.properties);
-            config.onready(this);
-        },
-
-        /**
-         * Programmatically set the response following the json schema described in
-         * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
-         * 
-         * @param {Object} interaction
-         * @param {Object} response
-         */
-        setResponse : function(response){
-
-        },
-        /**
-         * Get the response in the json format described in
-         * http://www.imsglobal.org/assessment/pciv1p0cf/imsPCIv1p0cf.html#_Toc353965343
-         * 
-         * @param {Object} interaction
-         * @returns {Object}
-         */
-        getResponse : function(interaction){
-
-            let _response = {};
-
-            // _response['scoreRaw'] = this.responseRaw;
-
-            if(this.response.size>0){
-                let score = {
-                    hits: {}
+            let instance = new ibTaoConnector($(dom), config.properties);
+            config.onready(instance);
                 }
-                this.response.forEach((_hit, _class) => {
-                    score.hits[_class] = _hit
                 });
-                _response['score'] = score;
-            }
-
-            if(this.traceLogs.length>0){
-                // _response['logs'] = zipson.stringify(this.traceLogs);
-                _response['logs'] = this.traceLogs;
-            }
-
-            if(!_response['score'] && !_response['logs'])
-                return { base: null };
-
-            return  {
-                base : {
-                    // string : JSON.stringify(['test', '123']).replace(/"/g,"'")
-                    // string : JSON.stringify(_response).replace(/"/g,"'")
-                    string : LZString.compressToBase64(JSON.stringify(_response))
-                }
-            }
-        },
-
-        /**
-         * Reverse operation performed by render()
-         * After this function is executed, only the inital naked markup remains 
-         * Event listeners are removed and the state and the response are reset
-         * 
-         * @param {Object} interaction
-         */
-        destroy : function(){
-
-            var $container = $(this.dom);
-            $container.off().empty();
-        },
-        /**
-         * Restore the state of the interaction from the serializedState.
-         *
-         * @param {Object} interaction
-         * @param {Object} serializedState - json format
-         */
-        setSerializedState : function(state){
-            if(state && state.response){
-                this.setResponse(state.response);
-            }
-        },
-
-        /**
-         * Get the current state of the interaction as a string.
-         * It enables saving the state for later usage.
-         *
-         * @param {Object} interaction
-         * @returns {Object} json format
-         */
-        getSerializedState : function(){
-            return {response : this.getResponse()};
-        },
-
-        getState : function(){
-            return {response : this.getResponse()};
-        },
-
-        /**
-         * Called by delivery engine when PCI is fully completed
-         */
-        oncompleted : function oncompleted(){
-            if(!!document.querySelector("section.content-wrapper").style)
-                document.querySelector("section.content-wrapper").style.overflow = "auto";            
-            this.destroy();
-        }
-};
-
-    qtiCustomInteractionContext.register(ibTaoConnector);
 });
