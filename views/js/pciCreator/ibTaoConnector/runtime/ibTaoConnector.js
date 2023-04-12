@@ -284,7 +284,7 @@ define(['qtiCustomInteractionContext',
 
     qtiCustomInteractionContext.register({
         getTypeIdentifier : function(){
-            return 'heICnX';
+            return 'ibTaoConnector';
         },
         getInstance :  function(dom, config, state){
             let instance = new ibTaoConnector($(dom), config.properties);
