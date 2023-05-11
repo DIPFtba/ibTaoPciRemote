@@ -289,6 +289,12 @@ define(['qtiCustomInteractionContext',
         getInstance :  function(dom, config, state){
             let instance = new ibTaoConnector($(dom), config.properties);
             config.onready(instance);
-                }
-                });
+        },
+        off:  function(event){
+            console.log(event);
+        },
+        on:  function(event){
+            console.log(event);
+        }
+    });
 });
