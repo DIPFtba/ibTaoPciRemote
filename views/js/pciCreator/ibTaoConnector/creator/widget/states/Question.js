@@ -83,43 +83,44 @@ define([
 
         //init data change callbacks
         formElement.setChangeCallbacks($form, interaction, {
-            url: function(interaction, value){
-                // console.log(interaction, value);
-                interaction.prop('url', value);
-                interaction.triggerPci('urlchange', [value]);
+            url: function(_interaction, value){
+                // console.log(_interaction, value);
+                _interaction.prop('url', value);
+                _interaction.triggerPci('urlchange', [value]);
             },
 
-            width: function(interaction, value){
-                // console.log(interaction, value);
-                interaction.prop('width', value);
-                interaction.triggerPci('itempropchange', [value, null, null, null]);
+            width: function(_interaction, value){
+                // console.log(_interaction, value);
+                _interaction.prop('width', value);
+                _interaction.triggerPci('itempropchange', [value, null, null, null]);
             },
-            height: function(interaction, value){
-                // console.log(interaction, value);
-                interaction.prop('height', value);
-                interaction.triggerPci('itempropchange', [null, value, null, null]);
+            height: function(_interaction, value){
+                // console.log(_interaction, value);
+                _interaction.prop('height', value);
+                _interaction.triggerPci('itempropchange', [null, value, null, null]);
             },
-            iwidth: function(interaction, value){
-                // console.log(interaction, value);
-                interaction.prop('iwidth', value);
-                interaction.triggerPci('itempropchange', [null, null, value, null]);
+            iwidth: function(_interaction, value){
+                // console.log(_interaction, value);
+                _interaction.prop('iwidth', value);
+                _interaction.triggerPci('itempropchange', [null, null, value, null]);
             },
-            iheight: function(interaction, value){
-                // console.log(interaction, value);
-                interaction.prop('iheight', value);
-                interaction.triggerPci('itempropchange', [null, null, null, value]);
+            iheight: function(_interaction, value){
+                // console.log(_interaction, value);
+                _interaction.prop('iheight', value);
+                _interaction.triggerPci('itempropchange', [null, null, null, value]);
             },
-            alignh: function(interaction, value){
-                // console.log(interaction, value);
-                interaction.prop('alignh', value);
-                interaction.triggerPci('h_alignchange', [value]);
+            alignh: function(_interaction, value){
+                // console.log(_interaction, value);
+                _interaction.prop('alignh', value);
+                _interaction.triggerPci('h_alignchange', [value]);
             },
-            navigationLock: function navigationLock(interaction, value) {
-                interaction.prop('navigationLock', value);
+            navigationLock: function navigationLock(_interaction, value) {
+                _interaction.prop('navigationLock', value);
+                console.log(_interaction.serial);
             },                           
-            fullscreen: function navigationLock(interaction, value) {
-                interaction.prop('fullscreen', value);
-                interaction.triggerPci('fullscreenchange', [value]);
+            fullscreen: function navigationLock(_interaction, value) {
+                _interaction.prop('fullscreen', value);
+                _interaction.triggerPci('fullscreenchange', [value]);
             },   
         });
 

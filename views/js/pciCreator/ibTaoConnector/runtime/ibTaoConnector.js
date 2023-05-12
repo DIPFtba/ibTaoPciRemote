@@ -26,46 +26,76 @@ define(['qtiCustomInteractionContext',
     'use strict';
 
 
-    function ibTaoConnector(dom, config) {
+    var pciInstance =  {
 
-            this.getResponse = function() {
-                let _response = {};
+        getTypeIdentifier : function(){
+            return 'ibTaoConnector';
+        },
 
-                // _response['scoreRaw'] = this.responseRaw;
-    
-                if(this.response.size>0){
-                    let score = {
-                        hits: {}
-                    }
-                    this.response.forEach((_hit, _class) => {
-                        score.hits[_class] = _hit
-                    });
-                    _response['score'] = score;
+        destroy : function(){
+            var $container = $(this.dom);
+            $container.off().empty();
+        },
+
+        off : function(){
+            this.destroy();
+        },
+
+        getSerializedState : function(){
+            return {response : this.getResponse()};
+        },
+
+        getState : function(){
+            return {response : this.getResponse()};
+        },
+
+        /**
+         * Called by delivery engine when PCI is fully completed
+         */
+        oncompleted : function oncompleted(){
+            this.destroy();
+        },
+
+        getResponse : function() {
+            let _response = {};
+
+            // _response['scoreRaw'] = this.responseRaw;
+
+            if(this.response.size>0){
+                let score = {
+                    hits: {}
                 }
-    
-                if(this.traceLogs.length>0){
-                    // _response['logs'] = zipson.stringify(this.traceLogs);
-                    _response['logs'] = this.traceLogs;
-                }
-    
-                if(!_response['score'] && !_response['logs'])
-                    return { base: null };
-    
-                return  {
-                    base : {
-                        // string : JSON.stringify(['test', '123']).replace(/"/g,"'")
-                        // string : JSON.stringify(_response).replace(/"/g,"'")
-                        string : LZString.compressToBase64(JSON.stringify(_response))
-                    }
-                }
+                this.response.forEach((_hit, _class) => {
+                    score.hits[_class] = _hit
+                });
+                _response['score'] = score;
             }
 
-            this.oncompleted = function(){
-                if(!!document.querySelector("section.content-wrapper").style)
-                    document.querySelector("section.content-wrapper").style.overflow = "auto";            
-                var $container = $(this.dom);
-                $container.off().empty();                
+            if(this.traceLogs.length>0){
+                // _response['logs'] = zipson.stringify(this.traceLogs);
+                _response['logs'] = this.traceLogs;
             }
+
+            if(!_response['score'] && !_response['logs'])
+                return { base: null };
+
+            return  {
+                base : {
+                    // string : JSON.stringify(['test', '123']).replace(/"/g,"'")
+                    // string : JSON.stringify(_response).replace(/"/g,"'")
+                    string : LZString.compressToBase64(JSON.stringify(_response))
+                }
+            }
+        },
+
+        oncompleted : function(){
+            if(!!document.querySelector("section.content-wrapper").style)
+                document.querySelector("section.content-wrapper").style.overflow = "auto";            
+            var $container = $(this.dom);
+            $container.off().empty();                
+        },
+
+        initialize : function(dom, config){
 
             this.off = this.oncompleted;
 
@@ -104,10 +134,10 @@ define(['qtiCustomInteractionContext',
             // });            
 
             /****** hide next / skip buttons (workaround for navigationLock) ******/
-			if(this.config?.navigationLock){
-				document.querySelectorAll("[data-control='next-section'], [data-control='move-end'], [data-control='move-forward'], [data-control='skip-end']")
-				.forEach(e => e.classList.add("hidden"));
-			}
+            if(this.config?.navigationLock){
+                document.querySelectorAll("[data-control='next-section'], [data-control='move-end'], [data-control='move-forward'], [data-control='skip-end']")
+                .forEach(e => e.classList.add("hidden"));
+            }
 
             renderer.render(this.id, this.dom, this.config);
 
@@ -235,22 +265,22 @@ define(['qtiCustomInteractionContext',
                 }
 
                 const endOfSequence = () => {
-					
-					if(this.config?.navigationLock){
+                    
+                    if(this.config?.navigationLock){
 
-						document.querySelectorAll("[data-control='next-section'], [data-control='move-end'], [data-control='move-forward'], [data-control='skip-end']")
-						.forEach(e => e.classList.remove("hidden"));
+                        document.querySelectorAll("[data-control='next-section'], [data-control='move-end'], [data-control='move-forward'], [data-control='skip-end']")
+                        .forEach(e => e.classList.remove("hidden"));
 
-						if($("[data-control='submit']").length)
-							$("[data-control='submit']").trigger("click");
+                        if($("[data-control='submit']").length)
+                            $("[data-control='submit']").trigger("click");
 
-						if($("[data-control='move-end']").length)
-							$("[data-control='move-end']").trigger("click");
-						else if($("[data-control='move-forward']").length)
-							$("[data-control='move-forward']").trigger("click");
-						else if($("[data-control='next-section']").length)
-							$("[data-control='next-section']").trigger("click");
-					}                    
+                        if($("[data-control='move-end']").length)
+                            $("[data-control='move-end']").trigger("click");
+                        else if($("[data-control='move-forward']").length)
+                            $("[data-control='move-forward']").trigger("click");
+                        else if($("[data-control='next-section']").length)
+                            $("[data-control='next-section']").trigger("click");
+                    }                    
                 }
 
                 const callbacks = {
@@ -272,29 +302,20 @@ define(['qtiCustomInteractionContext',
     
             // listen to messages from parent frame
             window.addEventListener('message', event => {
-				if(typeof event?.data != "string")
-					return;
+                if(typeof event?.data != "string")
+                    return;
                 if(event.source !== this.iframe.contentWindow)
                     return;
                 let data = JSON.parse(event.data);
                 receive(data.eventType, data);
             }, false);
-    };
+        },
 
+        getInstance : function(dom, config, state){
+            this.initialize($(dom), config.properties);
+            config.onready(this);
+        }            
+    };    
 
-    qtiCustomInteractionContext.register({
-        getTypeIdentifier : function(){
-            return 'ibTaoConnector';
-        },
-        getInstance :  function(dom, config, state){
-            let instance = new ibTaoConnector($(dom), config.properties);
-            config.onready(instance);
-        },
-        off:  function(event){
-            console.log(event);
-        },
-        on:  function(event){
-            console.log(event);
-        }
-    });
+    qtiCustomInteractionContext.register(pciInstance);
 });
